@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { api, type MeResponse } from "@/lib/api";
-import { LayoutDashboard, Settings, FileText, LogOut, Zap, MessageCircle } from "lucide-react";
+import { LayoutDashboard, Settings, FileText, LogOut, Zap, MessageCircle, Shield } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { whatsappSupport } from "@/lib/support";
 
@@ -23,7 +23,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     api.get<MeResponse>("/auth/me")
       .then((r) => {
         setMe(r.data);
-        // Redirect to onboarding if neither integration is connected
         const t = r.data.tenant;
         const isOnboarding = window.location.pathname.startsWith("/onboarding");
         if (!t.etimsConnectedAt && !t.mpesaConnectedAt && !isOnboarding) {
@@ -54,6 +53,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const initials = me.user.fullName
     .split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase();
+  const isAdmin = me.user.role === "ADMIN" || me.user.role === "SUPERADMIN";
 
   return (
     <div className="min-h-screen flex bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
@@ -99,6 +99,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <div className="text-[11px] text-[hsl(var(--muted-foreground))] truncate">{me.user.email}</div>
             </div>
           </div>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+            >
+              <Shield className="h-4 w-4" /> Admin console
+            </Link>
+          )}
           <a
             href={whatsappSupport()}
             target="_blank"
@@ -123,9 +131,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               {pathname.replace("/", "").split("/")[0] || "dashboard"}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-          </div>
+          <ThemeToggle />
         </header>
 
         <main className="flex-1 p-6 lg:p-8 overflow-y-auto">{children}</main>
