@@ -1,5 +1,5 @@
 /**
- * Promote / demote admins.
+ * Promote / demote admins with audit trail.
  *   pnpm admin:list
  *   pnpm admin:promote user@example.com
  *   pnpm admin:demote  user@example.com
@@ -37,8 +37,24 @@ async function main() {
   }
 
   const newRole = cmd === "promote" ? "ADMIN" : "OWNER";
-  await prisma.user.update({ where: { id: user.id }, data: { role: newRole } });
-  console.log(`OK: ${email} is now ${newRole}`);
+  const previousRole = user.role;
+
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({ where: { id: user.id }, data: { role: newRole } });
+    await tx.auditLog.create({
+      data: {
+        actorId: null,
+        actorEmail: "cli@system",
+        action: cmd === "promote" ? "admin.promote" : "admin.demote",
+        targetType: "User",
+        targetId: user.id,
+        payload: { email, previousRole, newRole },
+        ipAddress: "cli",
+      },
+    });
+  });
+
+  console.log(`OK: ${email} is now ${newRole} (was ${previousRole})`);
 }
 
 main()
