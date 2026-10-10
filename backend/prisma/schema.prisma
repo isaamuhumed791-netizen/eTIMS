@@ -41,6 +41,18 @@ model Tenant {
   mpesaEnv               String        @default("sandbox")
   mpesaConnectedAt       DateTime?
 
+  
+
+  plan                 String    @default("FOUNDING")
+
+  planExpiresAt        DateTime?
+
+  billingProvider      String?
+
+  billingCustomerId    String?
+
+  billingSubscriptionId String?
+
   users                  User[]
   apiKeys                ApiKey[]
   transactions           Transaction[]
