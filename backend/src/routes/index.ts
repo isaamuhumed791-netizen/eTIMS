@@ -10,6 +10,7 @@ import { adminSettingsRoutes } from "./admin/settings.routes.js";
 import { adminErrorsRoutes } from "./admin/errors.routes.js";
 import { adminAuditRoutes } from "./admin/audit.routes.js";
 import { adminQueueRoutes } from "./admin/queue.routes.js";
+import { adminLogsRoutes } from "./admin/logs.routes.js";
 
 export const registerRoutes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(publicRoutes,      { prefix: "/api/v1/public" });
@@ -25,4 +26,5 @@ export const registerRoutes: FastifyPluginAsync = async (fastify) => {
   await fastify.register(adminErrorsRoutes,   { prefix: "/api/v1/admin/errors" });
   await fastify.register(adminAuditRoutes,    { prefix: "/api/v1/admin/audit" });
   await fastify.register(adminQueueRoutes,    { prefix: "/api/v1/admin/queue" });
+  await fastify.register(adminLogsRoutes,     { prefix: "/api/v1/admin/logs" });
 };
