@@ -3,11 +3,15 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { api, type MeResponse } from "@/lib/api";
-import { LayoutDashboard, Settings, FileText, LogOut, Zap, MessageCircle, Shield } from "lucide-react";
+import {
+  LayoutDashboard, Settings, FileText, LogOut, MessageCircle, Shield, Home as HomeIcon, ArrowLeft,
+} from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/brand/logo";
 import { useSupportSettings, whatsappSupport } from "@/lib/support";
 
 const nav = [
+  { href: "/home",      label: "Home",      icon: HomeIcon },
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/invoices",  label: "Invoices",  icon: FileText },
   { href: "/settings",  label: "Settings",  icon: Settings },
@@ -40,11 +44,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     router.refresh();
   }
 
+  function goBack() {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/dashboard");
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--background))] text-[hsl(var(--muted-foreground))] text-sm">
         <div className="flex items-center gap-2">
-          <Zap className="h-4 w-4 animate-pulse text-[hsl(var(--primary))]" />
+          <span className="h-4 w-4 rounded-full bg-[hsl(var(--primary))]/50 animate-pulse" />
           Loading workspace...
         </div>
       </div>
@@ -55,24 +67,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const initials = me.user.fullName
     .split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase();
   const isAdmin = me.user.role === "ADMIN" || me.user.role === "SUPERADMIN";
+  const showBack = pathname !== "/dashboard" && !pathname.startsWith("/onboarding");
 
   return (
     <div className="min-h-screen flex bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
       <aside className="w-64 flex flex-col border-r border-[hsl(var(--border))] bg-[hsl(var(--card))]">
-        <div className="h-16 px-5 flex items-center gap-2 border-b border-[hsl(var(--border))]">
-          <div className="h-8 w-8 rounded-lg bg-[hsl(var(--primary))] flex items-center justify-center">
-            <Zap className="h-4 w-4 text-[hsl(var(--primary-foreground))]" />
-          </div>
-          <div className="min-w-0">
-            <div className="text-sm font-semibold truncate">eTIMS Middleware</div>
-            <div className="text-xs text-[hsl(var(--muted-foreground))] truncate">{me.tenant.name}</div>
+        <div className="h-16 px-4 flex items-center justify-between gap-2 border-b border-[hsl(var(--border))]">
+          <Logo href="/dashboard" size={28} />
+          <div className="text-[10px] uppercase tracking-wider text-[hsl(var(--muted-foreground))] truncate max-w-[80px]" title={me.tenant.name}>
+            {me.tenant.name}
           </div>
         </div>
 
         <nav className="flex-1 p-3 space-y-1">
           {nav.map((item) => {
             const Icon = item.icon;
-            const active = pathname === item.href || pathname.startsWith(item.href + "/");
+            const active =
+              item.href === "/"
+                ? pathname === "/home"
+                : pathname === item.href || pathname.startsWith(item.href + "/");
             return (
               <Link
                 key={item.href}
@@ -127,9 +140,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-16 px-6 flex items-center justify-between border-b border-[hsl(var(--border))] bg-[hsl(var(--card))]">
-          <div className="text-sm text-[hsl(var(--muted-foreground))]">
-            <span className="font-medium text-[hsl(var(--foreground))] capitalize">
-              {pathname.replace("/", "").split("/")[0] || "dashboard"}
+          <div className="flex items-center gap-3">
+            {showBack && (
+              <button
+                type="button"
+                onClick={goBack}
+                aria-label="Go back"
+                className="h-8 w-8 rounded-lg border border-[hsl(var(--border))] flex items-center justify-center text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--foreground))] transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+            )}
+            <span className="font-medium capitalize">
+              {pathname === "/" ? "Home" : pathname.replace("/", "").split("/")[0] || "Dashboard"}
             </span>
           </div>
           <ThemeToggle />

@@ -4,19 +4,20 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { api, type MeResponse } from "@/lib/api";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/brand/logo";
 import {
   LayoutDashboard, Users, AlertOctagon, ScrollText, ListChecks,
-  Settings as SettingsIcon, Terminal, LogOut, Shield, Zap,
+  Settings as SettingsIcon, Terminal, LogOut, Shield, Zap, ArrowLeft,
 } from "lucide-react";
 
 const nav = [
-  { href: "/admin",            label: "Overview",  icon: LayoutDashboard },
-  { href: "/admin/tenants",    label: "Tenants",   icon: Users },
-  { href: "/admin/errors",     label: "Errors",    icon: AlertOctagon },
-  { href: "/admin/logs",       label: "Live logs", icon: Terminal },
-  { href: "/admin/queue",      label: "Queue",     icon: ListChecks },
-  { href: "/admin/audit",      label: "Audit",     icon: ScrollText },
-  { href: "/admin/settings",   label: "Settings",  icon: SettingsIcon },
+  { href: "/admin",          label: "Overview",  icon: LayoutDashboard },
+  { href: "/admin/tenants",  label: "Tenants",   icon: Users },
+  { href: "/admin/errors",   label: "Errors",    icon: AlertOctagon },
+  { href: "/admin/logs",     label: "Live logs", icon: Terminal },
+  { href: "/admin/queue",    label: "Queue",     icon: ListChecks },
+  { href: "/admin/audit",    label: "Audit",     icon: ScrollText },
+  { href: "/admin/settings", label: "Settings",  icon: SettingsIcon },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -47,6 +48,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.refresh();
   }
 
+  function goBack() {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/admin");
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--background))]">
@@ -71,14 +80,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen flex bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
-      {/* ADMIN SIDEBAR */}
       <aside className="w-64 flex flex-col border-r border-red-500/20 bg-[hsl(var(--card))]">
-        <div className="h-16 px-5 flex items-center gap-2 border-b border-red-500/20">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center">
-            <Shield className="h-4 w-4 text-white" />
-          </div>
-          <div className="min-w-0">
-            <div className="text-sm font-semibold truncate">Admin Console</div>
+        <div className="h-16 px-4 flex items-center gap-2 border-b border-red-500/20">
+          <Logo href="/admin" size={28} showText={false} />
+          <div className="min-w-0 flex-1">
+            <div className="text-xs font-semibold truncate">Admin</div>
             <div className="text-[10px] uppercase tracking-wider text-red-500 font-semibold">
               {me.user.role}
             </div>
@@ -129,10 +135,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* MAIN */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-16 px-6 flex items-center justify-between border-b border-[hsl(var(--border))] bg-[hsl(var(--card))]">
           <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={goBack}
+              aria-label="Go back"
+              className="h-8 w-8 rounded-lg border border-[hsl(var(--border))] flex items-center justify-center text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--foreground))] transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </button>
             <div className="px-2 py-0.5 rounded-md bg-red-500/10 text-red-500 text-[10px] font-bold uppercase tracking-wider">
               Admin
             </div>
