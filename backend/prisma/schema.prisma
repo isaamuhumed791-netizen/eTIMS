@@ -135,3 +135,45 @@ model EtimsConfig {
   dvcSrlNo  String
   updatedAt DateTime @updatedAt
 }
+model SystemSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String?
+  actorEmail String?
+  action     String
+  targetType String?
+  targetId   String?
+  payload    Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([actorId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model ErrorEvent {
+  id          String    @id @default(uuid())
+  tenantId    String?
+  source      String
+  message     String
+  stack       String?
+  context     Json?
+  count       Int       @default(1)
+  firstSeenAt DateTime  @default(now())
+  lastSeenAt  DateTime  @default(now())
+  resolved    Boolean   @default(false)
+  resolvedAt  DateTime?
+  resolvedBy  String?
+
+  @@index([tenantId])
+  @@index([source])
+  @@index([resolved])
+  @@index([lastSeenAt])
+}

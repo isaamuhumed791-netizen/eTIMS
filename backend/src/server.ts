@@ -4,6 +4,7 @@ import cors from "@fastify/cors";
 import { env } from "./lib/env.js";
 import { logger } from "./lib/logger.js";
 import { registerRoutes } from "./routes/index.js";
+import { seedDefaultSettings } from "./lib/settings.js";
 
 const app = Fastify({ logger, trustProxy: true, bodyLimit: 1_048_576 });
 
@@ -15,6 +16,7 @@ await app.register(cookie);
 
 app.get("/health", async () => ({ status: "ok", ts: new Date().toISOString() }));
 
+await seedDefaultSettings();
 await app.register(registerRoutes);
 
 const shutdown = async (signal: string) => {
