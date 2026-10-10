@@ -28,6 +28,8 @@ const envSchema = z.object({
   HOST: z.string().default("0.0.0.0"),
   LOG_LEVEL: z.string().default("info"),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  ADMIN_BOOTSTRAP_EMAIL: z.preprocess((v) => (v === "" ? undefined : v), z.string().email().optional()),
+  ADMIN_BOOTSTRAP_PASSWORD: z.preprocess((v) => (v === "" ? undefined : v), z.string().min(8).optional()),
   FRONTEND_URL: z.string().default("http://localhost:3001"),
 });
 

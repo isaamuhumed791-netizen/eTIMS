@@ -5,7 +5,7 @@ import Link from "next/link";
 import { api, type MeResponse } from "@/lib/api";
 import { LayoutDashboard, Settings, FileText, LogOut, Zap, MessageCircle, Shield } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { whatsappSupport } from "@/lib/support";
+import { useSupportSettings, whatsappSupport } from "@/lib/support";
 
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -18,6 +18,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [me, setMe] = useState<MeResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const support = useSupportSettings();
 
   useEffect(() => {
     api.get<MeResponse>("/auth/me")
@@ -108,7 +109,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </Link>
           )}
           <a
-            href={whatsappSupport()}
+            href={whatsappSupport(support.whatsapp)}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--accent))] hover:text-[hsl(var(--foreground))] transition-colors"

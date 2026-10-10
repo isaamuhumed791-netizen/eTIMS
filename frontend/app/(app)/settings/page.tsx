@@ -1,9 +1,10 @@
 "use client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSupportSettings, mailtoSupport, whatsappSupport } from "@/lib/support";
 import { api, type TenantStatus } from "@/lib/api";
 import { useState } from "react";
 import {
-  CheckCircle2, XCircle, Eye, EyeOff, AlertCircle, ExternalLink,
+  CheckCircle2, XCircle, Eye, EyeOff, AlertCircle, ExternalLink, Phone,
 } from "lucide-react";
 
 export default function SettingsPage() {
@@ -132,27 +133,41 @@ function HelpToggle({ open, onToggle, children }: { open: boolean; onToggle: () 
 }
 
 function SupportCard() {
+  const support = useSupportSettings();
   return (
     <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6">
       <div className="font-medium">Need help?</div>
-      <div className="text-xs text-[hsl(var(--muted-foreground))] mt-1 mb-4">
-        We are here to help you get set up. Reach out any time.
+      <div className="text-xs text-[hsl(var(--muted-foreground))] mt-1">
+        We are here to help you get set up. {support.hours}.
       </div>
-      <div className="flex flex-wrap gap-2">
+      {support.phoneDisplay && (
+        <div className="text-xs text-[hsl(var(--muted-foreground))] mt-1">
+          Or call us on <span className="font-medium text-[hsl(var(--foreground))]">{support.phoneDisplay}</span>
+        </div>
+      )}
+      <div className="flex flex-wrap gap-2 mt-4">
         <a
-          href="mailto:support@example.com?subject=Support%20request"
+          href={mailtoSupport(support.email)}
           className="inline-flex items-center gap-1.5 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 py-1.5 text-xs font-medium hover:bg-[hsl(var(--accent))] transition-colors"
         >
           Email support
         </a>
         <a
-          href="https://wa.me/254700000000"
+          href={whatsappSupport(support.whatsapp)}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 rounded-lg bg-[hsl(var(--primary))] px-3 py-1.5 text-xs font-medium text-[hsl(var(--primary-foreground))] hover:opacity-90 transition-opacity"
         >
           WhatsApp us
         </a>
+        {support.phoneDisplay && (
+          <a
+            href={`tel:${support.phoneDisplay.replace(/\s+/g, "")}`}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 py-1.5 text-xs font-medium hover:bg-[hsl(var(--accent))] transition-colors"
+          >
+            <Phone className="h-3.5 w-3.5" /> Call us
+          </a>
+        )}
       </div>
     </div>
   );
